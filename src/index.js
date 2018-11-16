@@ -26,6 +26,16 @@ class PapertrailLogging {
     return 'papertrailLogger';
   }
 
+  getServiceName() {
+    return this.service.custom.papertrail.name ?
+        this.service.custom.papertrail.name : this.service.service
+  }
+
+  getPtProgramName() {
+    return this.service.custom.papertrail.programName ?
+        this.service.custom.papertrail.programName : this.service.provider.stage
+  }
+
   getEnvFilePath() {
     return path.join(this.serverless.config.servicePath, PapertrailLogging.getFunctionName());
   }
@@ -59,8 +69,8 @@ class PapertrailLogging {
     let handlerFunction = templateFile
       .replace('%papertrailHost%', this.papertrailHost)
       .replace('%papertrailPort%', this.service.custom.papertrail.port)
-      .replace('%papertrailHostname%', this.service.service)
-      .replace('%papertrailProgram%', this.service.provider.stage);
+      .replace('%papertrailHostname%', this.getServiceName())
+      .replace('%papertrailProgram%', this.getPtProgramName());
     fs.writeFileSync(path.join(functionPath, 'handler.js'), handlerFunction);
     this.service.functions[PapertrailLogging.getFunctionName()] = {
       handler: `${PapertrailLogging.getFunctionName()}/handler.handler`,
